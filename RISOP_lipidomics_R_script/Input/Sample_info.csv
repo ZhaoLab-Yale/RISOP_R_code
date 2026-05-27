@@ -1,0 +1,92 @@
+﻿Sample_name,Group,Protein,Time,Outlier,rdmz_Ijtn_order,clean_order
+blank1,Blank,,,,,1
+blank2,Blank,,,,,2
+blank3,Blank,,,,,3
+blank4,Blank,,,,,4
+blank5,Blank,,,,,5
+blank6,Blank,,,,,6
+blank7,Blank,,,,,7
+blank8,Blank,,,,,8
+blank9,Blank,,,,,9
+blank10,Blank,,,,,10
+blank11,Blank,,,,,11
+blank12,Blank,,,,,12
+blank13,Blank,,,,,13
+Extraction_blank1,Extraction_blank,,,,,14
+Extraction_blank2,Extraction_blank,,,,,15
+Extraction_blank3,Extraction_blank,,,,,16
+InternalSTD1,IS,,,,,17
+InternalSTD2,IS,,,,,18
+InternalSTD3,IS,,,,,19
+Fenton_0h_1,Fenton,,0 h,,,20
+Fenton_0h_2,Fenton,,0 h,,,21
+Fenton_0h_3,Fenton,,0 h,,,22
+Fenton_1min_1,Fenton,,1 min,,,23
+Fenton_1min_2,Fenton,,1 min,,,24
+Fenton_1min_3,Fenton,,1 min,,,25
+Fenton_20min_1,Fenton,,20 min,,,26
+Fenton_20min_2,Fenton,,20 min,,,27
+Fenton_20min_3,Fenton,,20 min,,,28
+Fenton_4h_1,Fenton,,4 h,,,29
+Fenton_4h_2,Fenton,,4 h,,,30
+Fenton_4h_3,Fenton,,4 h,,,31
+Fenton_24h_1,Fenton,,24 h,,,32
+Fenton_24h_2,Fenton,,24 h,,,33
+Fenton_24h_3,Fenton,,24 h,,,34
+Fenton_72h_1,Fenton,,72 h,,,35
+Fenton_72h_2,Fenton,,72 h,,,36
+Fenton_72h_3,Fenton,,72 h,,,37
+Fenton_2XQC_1,Fenton_QC,,,,,38
+Fenton_2XQC_2,Fenton_QC,,,,,39
+Fenton_2XQC_3,Fenton_QC,,,,,40
+Fenton_2XQC_4,Fenton_QC,,,,,41
+H2O2_0h_1,H2O2,,0 h,,,42
+H2O2_0h_2,H2O2,,0 h,,,43
+H2O2_0h_3,H2O2,,0 h,,,44
+H2O2_1min_1,H2O2,,1 min,,,45
+H2O2_1min_2,H2O2,,1 min,,,46
+H2O2_1min_3,H2O2,,1 min,,,47
+H2O2_20min_1,H2O2,,20 min,,,48
+H2O2_20min_2,H2O2,,20 min,,,49
+H2O2_20min_3,H2O2,,20 min,,,50
+H2O2_4h_1,H2O2,,4 h,,,51
+H2O2_4h_2,H2O2,,4 h,,,52
+H2O2_4h_3,H2O2,,4 h,,,53
+H2O2_24h_1,H2O2,,24 h,,,54
+H2O2_24h_2,H2O2,,24 h,,,55
+H2O2_24h_3,H2O2,,24 h,,,56
+H2O2_72h_1,H2O2,,72 h,,,57
+H2O2_72h_2,H2O2,,72 h,,,58
+H2O2_72h_3,H2O2,,72 h,,,59
+H2O2_2XQC_1,H2O2_QC,,,,,60
+H2O2_2XQC_2,H2O2_QC,,,,,61
+H2O2_2XQC_3,H2O2_QC,,,,,62
+H2O2_2XQC_4,H2O2_QC,,,,,63
+ML210_0min_1,ML210,64.64285714,0 min,,,64
+ML210_0min_2,ML210,67.70714286,0 min,,,65
+ML210_0min_3,ML210,61.8,0 min,,,66
+ML210_20min_1,ML210,68.77857143,20 min,,,67
+ML210_20min_2,ML210,74.31428571,20 min,,,68
+ML210_20min_3,ML210,70.74285714,20 min,,,69
+ML210_45min_1,ML210,70.45,45 min,,,70
+ML210_45min_2,ML210,79.25,45 min,,,71
+ML210_45min_3,ML210,71.40714286,45 min,,,72
+ML210_80min_1,ML210,72.93571429,80 min,,,73
+ML210_80min_2,ML210,64.79285714,80 min,,,74
+ML210_80min_3,ML210,69.22142857,80 min,,,75
+ML210_120min_1,ML210,61.08571429,120 min,,,76
+ML210_120min_2,ML210,66.75,120 min,,,77
+ML210_120min_3,ML210,55.42857143,120 min,,,78
+ML210_270min_1,ML210,68.25714286,270 min,,,79
+ML210_270min_2,ML210,54.88571429,270 min,,,80
+ML210_270min_3,ML210,54.42142857,270 min,,,81
+ML210_2XQC_1,ML210_QC,,,,,82
+ML210_2XQC_2,ML210_QC,,,,,83
+ML210_2XQC_3,ML210_QC,,,,,84
+ML210_2XQC_4,ML210_QC,,,,,85
+ML210_2XQC_5,ML210_QC,,,,,86
+FentonH2O2_4XQC_1,ML210_oxQC,,,,,87
+FentonH2O2_4XQC_2,ML210_oxQC,,,,,88
+FentonH2O2_4XQC_3,ML210_oxQC,,,,,89
+FentonH2O2_4XQC_4,ML210_oxQC,,,,,90
+FentonH2O2_4XQC_5,ML210_oxQC,,,,,91
