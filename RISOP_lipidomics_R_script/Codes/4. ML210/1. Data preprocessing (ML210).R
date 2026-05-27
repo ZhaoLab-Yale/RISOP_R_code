@@ -10,10 +10,8 @@ setwd(rstudioapi::getActiveProject())
 # 1. Load data # -----
 # ============================================================
 
-# 1.1 Specify normalization method
 Norm_method = "Protein_norm"
 
-# 1.2 Load curated lipid data, internal standards, and sample metadata
 df_curated     <- read.csv('./Input/df_curated_ML210.csv',    stringsAsFactors = F, skip = 0, header = T)
 cust_curated   <- read.csv('./Input/cust_curated_ML210.csv',  stringsAsFactors = F, skip = 0, header = T)
 species_for_QT <- read.csv('./Input/species_for_QT.csv',      stringsAsFactors = F, skip = 0, header = T)
@@ -23,25 +21,21 @@ Sample_info    <- read.csv('./Input/Sample_info.csv',         stringsAsFactors =
 # 2. Pre-process input data # -----
 # ============================================================
 
-# 2.1 Remove ISF
 df_curated <- df_curated %>%
   filter(!Alignment.ID %in% c("38015", "39402", "30767", "39995", "41440", "39887", "42220")) %>%
   select(-Alignment.ID)
 
-# 2.2 Strip "Ox" and "Ether" from ontology for class-level grouping
 df_curated <- df_curated %>%
   mutate(New_ontology = str_remove_all(Ontology, "Ox|Ether"))
 
 cust_curated <- cust_curated %>%
   mutate(New_ontology = str_remove_all(Ontology, "Ox|Ether"))
 
-# 2.3 Keep only non-outlier samples present in df_curated
 sample_vector <- Sample_info %>%
   filter(is.na(Outlier) | Outlier != "Yes") %>%
   pull(Sample_name) %>%
   intersect(colnames(df_curated))
 
-# 2.4 Calculate IS concentration in the reconstitution volume
 species_for_QT <- species_for_QT %>%
   mutate(
     Stock.cont.uM      = as.numeric(Stock.cont.uM),
@@ -54,7 +48,6 @@ species_for_QT <- species_for_QT %>%
 # 3. Reshape to long format # -----
 # ============================================================
 
-# 3.1 Pivot endogenous lipids to long format
 df_long <- df_curated %>%
   select(Average.Rt.min.,
          Metabolite.curated,
@@ -68,7 +61,6 @@ df_long <- df_curated %>%
     values_to = "Area"
   )
 
-# 3.2 Pivot internal standards to long format and attach IS concentration
 IS_long <- cust_curated %>%
   filter(Ontology %in% species_for_QT$Ontology & Adduct.type %in% species_for_QT$Adduct) %>%
   select(Adduct.type, Ontology, sample_vector) %>%
@@ -79,7 +71,6 @@ IS_long <- cust_curated %>%
     values_to = "IS_area"
   )
 
-# 3.3 Join IS information onto endogenous lipid data
 all_lipid_info <- df_long %>%
   left_join(IS_long %>%
               select(Adduct.type, Ontology, Sample_name, IS.Cont, IS_area),
@@ -90,12 +81,10 @@ all_lipid_info <- df_long %>%
 # 4. Quantification # -----
 # ============================================================
 
-# 4.1 Absolute quantification: lipid_area / (IS_area / IS_concentration)
 lipid_abs <- all_lipid_info %>%
   mutate(abs_cont = Area / IS_area * IS.Cont) %>%
   na.omit()
 
-# 4.2 Retain lipids without IS for relative quantification using raw area
 Lipid_rela <- all_lipid_info[rowSums(is.na(all_lipid_info)) > 0, ] %>%
   .[, colSums(is.na(.)) == 0]
 
@@ -103,7 +92,6 @@ Lipid_rela <- all_lipid_info[rowSums(is.na(all_lipid_info)) > 0, ] %>%
 # 5. Compute normalization factors # -----
 # ============================================================
 
-# 5.1 Mean, median, and sum across all lipids with IS
 all_mean_median <- lipid_abs %>%
   group_by(Sample_name) %>%
   summarize(
@@ -118,7 +106,6 @@ all_mean_median <- lipid_abs %>%
     NF_total_sum    = total_sum    / mean(total_sum)
   )
 
-# 5.2 Normalization factors restricted to major phospholipid classes
 PL_mean_median <- lipid_abs %>%
   filter(Ontology %in% c("PA", "PC", "PE", "PI", "PS", "PG", "LPC", "LPE")) %>%
   group_by(Sample_name) %>%
@@ -134,7 +121,6 @@ PL_mean_median <- lipid_abs %>%
     NF_PL_sum    = PL_sum    / mean(PL_sum)
   )
 
-# 5.3 Sum of raw peak areas per lipid class and adduct
 Class_area_sum <- all_lipid_info %>%
   group_by(New_ontology, Adduct.type, Sample_name) %>%
   summarize(
@@ -142,7 +128,6 @@ Class_area_sum <- all_lipid_info %>%
     .groups = "drop"
   )
 
-# 5.4 Total raw peak area per sample
 Total_area <- all_lipid_info %>%
   group_by(Sample_name) %>%
   summarize(
@@ -150,7 +135,6 @@ Total_area <- all_lipid_info %>%
     .groups = "drop"
   )
 
-# 5.5 Sum of absolute concentrations per lipid class and adduct
 Class_cont_sum <- lipid_abs %>%
   group_by(New_ontology, Adduct.type, Sample_name) %>%
   summarize(
@@ -162,7 +146,6 @@ Class_cont_sum <- lipid_abs %>%
 # 6. Merge normalization factors and apply normalization # -----
 # ============================================================
 
-# 6.1 Merge all normalization factors
 val_for_abs_norm <- lipid_abs %>%
   left_join(all_mean_median, by = "Sample_name") %>%
   left_join(PL_mean_median,  by = "Sample_name") %>%
@@ -179,7 +162,6 @@ val_for_rela_norm <- Lipid_rela %>%
   left_join(Class_cont_sum,  by = c("Sample_name", "New_ontology", "Adduct.type")) %>%
   left_join(Sample_info,     by = "Sample_name")
 
-# 6.2 Apply normalization (Protein_norm unit: nmol/mg protein × 150 uL)
 lip_abs_norm <- val_for_abs_norm %>%
   mutate(
     all_median_norm   = abs_cont / NF_total_median,
@@ -214,7 +196,6 @@ lip_rela_norm <- val_for_rela_norm %>%
 # 7. Pivot wide, filter low-coverage rows, and impute # -----
 # ============================================================
 
-# 7.1 Pivot to wide format and compute zero/NA percentage per row
 abs_norm_wd <- lip_abs_norm %>%
   select(c("Metabolite.curated", "Sample_name", !!sym(Norm_method))) %>%
   pivot_wider(
@@ -233,7 +214,6 @@ rela_norm_wd <- lip_rela_norm %>%
   column_to_rownames(var = "Metabolite.curated") %>%
   mutate(Zero_percent = rowSums(across(everything(), ~ . == 0 | is.na(.))) / ncol(.))
 
-# 7.2 Remove rows where zeros/NAs exceed threshold (15 out of 18 samples)
 abs_norm_wd <- abs_norm_wd %>%
   filter(Zero_percent < 15/18) %>%
   select(-Zero_percent)
@@ -242,8 +222,6 @@ rela_norm_wd <- rela_norm_wd %>%
   filter(Zero_percent < 15/18) %>%
   select(-Zero_percent)
 
-# 7.3 Imputation: replace zeros with NA, log2-transform, impute from 5th percentile,
-#     cap at row minimum, then back-transform
 impt.func <- function(norm.df) {
   Norm_0_replace <- norm.df
   Norm_0_replace[Norm_0_replace == 0] <- NA
@@ -281,13 +259,11 @@ impt_rela <- impt.func(rela_norm_wd) %>%
   mutate(across(where(is.numeric), ~ 2 ^ .))
 
 # ============================================================
-# 8. combined lipid table # -----
+# 8. Combined lipid table # -----
 # ============================================================
 
-# 8.1 Use molar concentration quantification only
 cmbd_lipids <- rbind(impt_abs)
 
-# 8.2 Refine ontology to distinguish ether lipid subtypes (P- vs O-)
 cmbd_lipids <- cmbd_lipids %>%
   mutate(Ontology = case_when(
     str_detect(Metabolite.curated, "-") ~ {
@@ -302,7 +278,6 @@ cmbd_lipids <- cmbd_lipids %>%
 # 9. CV-based filtering # -----
 # ============================================================
 
-# 9.1 Compute per-timepoint CV and minimum CV per lipid
 timepoints <- c("0min", "20min", "45min", "80min", "120min", "270min")
 
 cv_df <- timepoints %>%
@@ -327,7 +302,6 @@ cv_df <- timepoints %>%
   }) %>%
   ungroup()
 
-# 9.2 Filter to lipids with min CV < 20%
 cmbd_lipids <- cmbd_lipids %>%
   filter(Metabolite.curated %in% (cv_df %>% filter(min_CV < 20) %>% pull(Metabolite.curated)))
 
@@ -341,7 +315,6 @@ save(cmbd_lipids, file = paste0("./Output/cmbd_lipids.Rdata"))
 # 11. Build supplementary tables and export # -----
 # ============================================================
 
-# 11.1 reformat Metabolite.curated to lipid name style
 format_lipid_names <- function(df) {
   df %>%
     mutate(Metabolite.curated = gsub("^(\\w+) ([^ (]+)( \\(([a-z])\\))?$",
@@ -355,7 +328,6 @@ format_lipid_names <- function(df) {
     relocate(Adduct, `Retention time`, .after = Lipid)
 }
 
-# 11.2 rename LPC(O-) / LPE(P-) ambiguous species
 rename_ether_lipids <- function(df) {
   df %>%
     mutate(Lipid = case_when(
@@ -394,6 +366,7 @@ cv_df_formatted <- cv_df %>%
                                    Metabolite.curated) %>%
            gsub(" \\(([a-z])\\)", "(\\1)", .))
 
+# OxPLs prefiltered：
 Ox_ML210_prefiltered <- cmbd_lipids_pre %>%
   filter(grepl("<", Lipid, fixed = TRUE)) %>%
   left_join(cv_df_formatted %>% select(Metabolite.curated, min_CV),
@@ -402,8 +375,14 @@ Ox_ML210_prefiltered <- cmbd_lipids_pre %>%
   select(-min_CV) %>%
   relocate(Removal, .after = Lipid)
 
+# NonOx prefiltered：
 NonOx_ML210_prefiltered <- cmbd_lipids_pre %>%
   filter(!grepl("<", Lipid, fixed = TRUE)) %>%
+  left_join(cv_df_formatted %>% select(Metabolite.curated, min_CV),
+            by = c("Lipid" = "Metabolite.curated")) %>%
+  mutate(Removal = ifelse(min_CV >= 20, "CV>=20%", NA)) %>%
+  select(-min_CV) %>%
+  relocate(Removal, .after = Lipid) %>%
   rename_ether_lipids()
 
 # 11.4 Filtered supplementary table (after CV filter)
@@ -425,7 +404,7 @@ NonOx_ML210_filtered <- cmbd_lipids_post %>%
   filter(!grepl("<", Lipid, fixed = TRUE)) %>%
   rename_ether_lipids()
 
-# 11.5 Export all four sheets
+# 11.5 Export
 list(
   `OxPLs (prefiltered)`        = Ox_ML210_prefiltered,
   `NonOx_lipids (prefiltered)` = NonOx_ML210_prefiltered,
