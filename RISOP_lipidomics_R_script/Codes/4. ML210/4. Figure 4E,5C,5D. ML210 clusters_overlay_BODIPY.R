@@ -351,7 +351,7 @@ legend_labels <- c(
   sprintf("Total OxPLs in cluster 3 (*R* = %.3f, *P* = %.3f)",
           correlations$Pearson_r[correlations$Cluster == "3"],
           correlations$Pearson_p_adj[correlations$Cluster == "3"]),
-  "Peroxidative\u2212positive cells by BODIPY C11"
+  "Peroxidation\u2212positive cells by BODIPY C11"
 )
 
 # 11.2 Bracket segments showing significance at last time point
