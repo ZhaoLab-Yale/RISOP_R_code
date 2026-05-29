@@ -239,7 +239,7 @@ legend_labels <- c(
   sprintf("Overall total OxPLs (*R* = %.3f, *P* = %.3f)",
           correlation_result$Pearson_r,
           correlation_result$Pearson_p),
-  "Peroxidative-positive cells by BODIPY C11"
+  "Peroxidation-positive cells by BODIPY C11"
 )
 
 # ============================================================
